@@ -49,6 +49,12 @@ def sucuri_to_log_analytics():
                         try:
                             x["request_date"] = yesterday.strftime("%d-%b-%Y")
                             x["request_time"] = datetime.now().strftime("%H:%M:%S")
+                            try:
+                                del x['geo_location']
+                            except KeyError:
+                                continue
+                            except TypeError:
+                                pass
                         except:
                             pass
                     body = json.dumps(body)
