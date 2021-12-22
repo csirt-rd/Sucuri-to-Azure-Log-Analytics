@@ -12,6 +12,7 @@ SUCURI_SITES = []
 
 # Azure Log Analytics
 def sucuri_to_log_analytics(key, secret, date):
+    mutex.acquire()
     body = requests.post(
         SUCURI_API_URL,
         data={
@@ -67,10 +68,12 @@ def sucuri_to_log_analytics(key, secret, date):
             'x-ms-date': rfc1123date
             }
         )
+    mutex.release()
 
 if __name__ == "__main__":
     yesterday = datetime.now() - timedelta(1)
     threads = list()
+    mutex = threading.Lock()
     for i in SUCURI_SITES:
         if i["enabled"]:
             x = threading.Thread(target=sucuri_to_log_analytics, args=(i["key"],i["secret"],yesterday), daemon=True)
