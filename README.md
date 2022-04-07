@@ -52,22 +52,19 @@ python3 app.py
 #### Configuración:
 
 ```python
-AZURE_WORKSPACE_ID = ...   #Cambiar al LogAnalytics Workspace ID correspondiente
-AZURE_SHARED_KEY = ...     #Cambiar al LogAnalytics Workspace shared key correspondiente
-AZURE_LOG_TYPE = ...       #Cambiar al nombre de Custom Log de LogAnalytics Workspace correspondiente
+AZURE_WORKSPACE_ID = ...   # Cambiar al LogAnalytics Workspace ID correspondiente
+AZURE_SHARED_KEY = ...     # Cambiar al LogAnalytics Workspace shared key correspondiente
+AZURE_LOG_TYPE = ...       # Cambiar al nombre de Custom Log de LogAnalytics Workspace correspondiente
 SUCURI_SITES = [
-    ...
     {
-        "domain": "",
-        "key": "",
-        "secret": "",
-        "added_time": "",
-        "enabled": True    #Cambiar a False como sea conveniente.
+        "secret": "...",   # Añadir tantos API_SECRET como le sea necesario.
+        ...
     },
-    ...
 ]
 ```
 
 #### Referencias:
 
+https://waf.sucuri.net/?apidocs
 https://docs.microsoft.com/en-us/azure/azure-monitor/logs/data-collector-api
+https://medium.com/slalom-build/reading-and-writing-to-azure-log-analytics-c78461056862
