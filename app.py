@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
+import threading, requests, json, hashlib, base64, hmac
 from datetime import datetime, timedelta
-import threading, json, hashlib, base64, hmac, requests
 
 # Azure Log Analytics
-AZURE_WORKSPACE_ID = ""
-AZURE_SHARED_KEY = ""
-AZURE_LOG_TYPE = ""
+AZURE_WORKSPACE_ID = "..."
+AZURE_SHARED_KEY = "..."
+AZURE_LOG_TYPE = "..."
 # Sucuri Info
 SUCURI_API_URL = "https://waf.sucuri.net/api?v2"
-SUCURI_SITES = []
+SUCURI_API_KEY = "..."
+SUCURI_SITES = [
+    ...
+]
 
-# Azure Log Analytics
-def sucuri_to_log_analytics(key, secret, date):
+def sucuri_to_log_analytics(key, secret, date, mutex):
     mutex.acquire()
     body = requests.post(
         SUCURI_API_URL,
@@ -73,10 +75,29 @@ def sucuri_to_log_analytics(key, secret, date):
 if __name__ == "__main__":
     yesterday = datetime.now() - timedelta(1)
     threads = list()
-    mutex = threading.Lock()
+    mtx = threading.Lock()
     for i in SUCURI_SITES:
+        data = requests.post(
+            SUCURI_API_URL,
+            data={
+                "k": SUCURI_API_KEY,
+                "s": i['secret'],
+                "a": "show_settings"
+            }
+        ).json()
+        i['enabled'] = True if data['output']['proxy_active'] == 1 else False
+        i['domain'] = data['output']['domain']
+        i['key'] = SUCURI_API_KEY
         if i["enabled"]:
-            x = threading.Thread(target=sucuri_to_log_analytics, args=(i["key"],i["secret"],yesterday), daemon=True)
+            x = threading.Thread(
+                target=sucuri_to_log_analytics,
+                args=(
+                    i["key"],
+                    i["secret"],
+                    yesterday,
+                    mtx
+                ), daemon=True
+            )
             threads.append(x)
             x.start()
     for index, thread in enumerate(threads):
